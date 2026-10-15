@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CardioSense AI — Heart Disease Prediction System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+  <!-- Vercel Speed Insights -->
+  <script>
+    window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-red-600 flex items-center justify-center text-white shadow-md shadow-rose-200">
+          <i class="fa-solid fa-heart-pulse text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">CardioSense AI</h1>
+          <p class="text-xs text-slate-500">Clinical Decision Support & Risk Analysis</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="/health" target="_blank" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition inline-flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> API Online
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Intro Banner -->
+    <div class="mb-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="max-w-2xl relative z-10">
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-3">
+          Machine Learning Diagnostic Tool
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Heart Disease Risk Prediction</h2>
+        <p class="mt-2 text-sm text-slate-300 leading-relaxed">
+          Enter clinical indicators and diagnostic measurements below to evaluate cardiovascular disease risk using our trained Logistic Regression model.
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <button type="button" onclick="loadSample('healthy')" class="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium backdrop-blur transition border border-white/10 flex items-center gap-2">
+            <i class="fa-regular fa-circle-check text-emerald-400"></i> Sample: Healthy Patient
+          </button>
+          <button type="button" onclick="loadSample('risk')" class="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium backdrop-blur transition border border-white/10 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Sample: High-Risk Patient
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- Patient Form -->
+      <div class="lg:col-span-8 bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <form id="predictionForm" onsubmit="submitForm(event)">
+
+          <!-- Section 1: Demographics & Vitals -->
+          <div class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-user-doctor text-rose-500"></i> Patient Demographics & Vitals
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Age -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Age (Years)</label>
+                <input type="number" id="age" name="age" required min="1" max="120" value="52" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition">
+              </div>
+
+              <!-- Sex -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Sex</label>
+                <select id="sex" name="sex" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+
+              <!-- Resting BP -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Resting Blood Pressure (mm Hg)</label>
+                <input type="number" id="trestbps" name="trestbps" required min="50" max="250" value="125" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition">
+              </div>
+
+              <!-- Max Heart Rate -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Max Heart Rate Achieved (thalach)</label>
+                <input type="number" id="thalach" name="thalach" required min="40" max="230" value="168" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Laboratory & Symptoms -->
+          <div class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-flask-vial text-indigo-500"></i> Laboratory & Symptom Assessment
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Serum Cholesterol -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Serum Cholesterol (mg/dl)</label>
+                <input type="number" id="chol" name="chol" required min="100" max="600" value="212" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition">
+              </div>
+
+              <!-- Fasting Blood Sugar -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Fasting Blood Sugar > 120 mg/dl</label>
+                <select id="fbs" name="fbs" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">False (≤ 120 mg/dl)</option>
+                  <option value="1">True (> 120 mg/dl)</option>
+                </select>
+              </div>
+
+              <!-- Chest Pain Type -->
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Chest Pain Type (cp)</label>
+                <select id="cp" name="cp" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">0: Typical Angina</option>
+                  <option value="1">1: Atypical Angina</option>
+                  <option value="2">2: Non-anginal Chest Pain</option>
+                  <option value="3">3: Asymptomatic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Electrocardiogram & Stress Testing -->
+          <div class="mb-8">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-amber-500"></i> ECG & Stress Test Results
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Resting ECG -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Resting ECG Results (restecg)</label>
+                <select id="restecg" name="restecg" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">0: Normal</option>
+                  <option value="1">1: ST-T Wave Abnormality</option>
+                  <option value="2">2: Left Ventricular Hypertrophy</option>
+                </select>
+              </div>
+
+              <!-- Exercise Induced Angina -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Exercise Induced Angina (exang)</label>
+                <select id="exang" name="exang" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+
+              <!-- Oldpeak -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">ST Depression Induced (oldpeak)</label>
+                <input type="number" step="0.1" id="oldpeak" name="oldpeak" required min="0" max="10" value="1.0" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition">
+              </div>
+
+              <!-- Slope -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Slope of Peak ST Segment (slope)</label>
+                <select id="slope" name="slope" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">0: Upsloping</option>
+                  <option value="1">1: Flat</option>
+                  <option value="2" selected>2: Downsloping</option>
+                </select>
+              </div>
+
+              <!-- Major Vessels -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Major Vessels Colored (ca: 0–3)</label>
+                <select id="ca" name="ca" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="0">0 Vessels</option>
+                  <option value="1">1 Vessel</option>
+                  <option value="2">2 Vessels</option>
+                  <option value="3">3 Vessels</option>
+                </select>
+              </div>
+
+              <!-- Thalassemia -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Thalassemia (thal)</label>
+                <select id="thal" name="thal" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none text-sm transition bg-white">
+                  <option value="1">1: Normal</option>
+                  <option value="2" selected>2: Fixed Defect</option>
+                  <option value="3">3: Reversible Defect</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <button type="reset" class="px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-sm font-semibold transition">
+              Reset Form
+            </button>
+            <button type="submit" id="submitBtn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold text-sm shadow-lg shadow-rose-200 transition-all transform active:scale-95 flex items-center gap-2">
+              <span id="btnText">Analyze Heart Risk</span>
+              <i id="btnIcon" class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Results Column -->
+      <div class="lg:col-span-4 sticky top-24">
+        <div id="resultCard" class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm transition-all">
+          <div class="flex items-center gap-3 mb-4">
+            <div id="statusIconWrap" class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
+              <i id="statusIcon" class="fa-solid fa-chart-pie text-xl"></i>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider font-bold text-slate-400">Prediction Result</p>
+              <h3 id="diagnosisTitle" class="text-lg font-bold text-slate-800">Ready for Evaluation</h3>
+            </div>
+          </div>
+
+          <div id="placeholderText" class="text-sm text-slate-500 leading-relaxed py-4 border-y border-slate-100">
+            Submit patient indicators to calculate risk probability and clinical recommendation.
+          </div>
+
+          <!-- Active Result Content (Hidden by default) -->
+          <div id="resultDetails" class="hidden space-y-5 pt-3">
+            <div>
+              <div class="flex justify-between items-center text-xs font-semibold mb-1">
+                <span class="text-slate-500">Calculated Disease Risk</span>
+                <span id="riskScoreLabel" class="text-sm font-bold text-slate-800">0%</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                <div id="riskBar" class="h-full bg-rose-500 rounded-full transition-all duration-700" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div id="badgeContainer">
+              <span id="riskBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+                Awaiting Data
+              </span>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 leading-relaxed" id="adviceBox">
+              —
+            </div>
+          </div>
+
+          <!-- API Call Quick Reference -->
+          <div class="mt-6 pt-5 border-t border-slate-100">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Programmatic REST API</p>
+            <div class="bg-slate-900 rounded-xl p-3 text-xs font-mono text-slate-300 overflow-x-auto">
+              <span class="text-rose-400 font-bold">POST</span> /predict<br>
+              <span class="text-slate-500">Content-Type:</span> application/json
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Script for Handling Submission & Samples -->
+  <script>
+    const samples = {
+      healthy: {
+        age: 67, sex: 1, cp: 0, trestbps: 160, chol: 286, fbs: 0,
+        restecg: 0, thalach: 108, exang: 1, oldpeak: 1.5, slope: 1, ca: 3, thal: 2
+      },
+      risk: {
+        age: 37, sex: 1, cp: 2, trestbps: 130, chol: 250, fbs: 0,
+        restecg: 1, thalach: 187, exang: 0, oldpeak: 3.5, slope: 0, ca: 0, thal: 2
+      }
+    };
+
+    function loadSample(type) {
+      const data = samples[type];
+      for (const key in data) {
+        const input = document.getElementById(key);
+        if (input) input.value = data[key];
+      }
+      submitForm(new Event('submit'));
+    }
+
+    async function submitForm(event) {
+      if (event) event.preventDefault();
+
+      const form = document.getElementById('predictionForm');
+      const formData = new FormData(form);
+      const payload = {};
+      formData.forEach((value, key) => { payload[key] = value; });
+
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      btnText.innerText = 'Calculating...';
+      btnIcon.className = 'fa-solid fa-spinner fa-spin';
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const resData = await response.json();
+
+        if (response.ok && resData.status === 'success') {
+          displayResult(resData.data);
+        } else {
+          alert('Error: ' + (resData.message || 'Prediction failed. Check input values.'));
+        }
+      } catch (err) {
+        alert('Network or server error: ' + err.message);
+      } finally {
+        btnText.innerText = 'Analyze Heart Risk';
+        btnIcon.className = 'fa-solid fa-arrow-right';
+      }
+    }
+
+    function displayResult(result) {
+      document.getElementById('placeholderText').classList.add('hidden');
+      document.getElementById('resultDetails').classList.remove('hidden');
+
+      const isDisease = result.prediction === 1;
+      const riskScore = result.risk_percentage;
+
+      document.getElementById('diagnosisTitle').innerText = result.diagnosis;
+      document.getElementById('riskScoreLabel').innerText = riskScore + '%';
+      document.getElementById('adviceBox').innerText = result.advice;
+
+      const riskBar = document.getElementById('riskBar');
+      const statusIconWrap = document.getElementById('statusIconWrap');
+      const statusIcon = document.getElementById('statusIcon');
+      const riskBadge = document.getElementById('riskBadge');
+
+      riskBar.style.width = riskScore + '%';
+
+      if (isDisease) {
+        riskBar.className = 'h-full bg-rose-600 rounded-full transition-all duration-700';
+        statusIconWrap.className = 'w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center';
+        statusIcon.className = 'fa-solid fa-heart-crack text-xl';
+        riskBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+        riskBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + result.risk_level;
+      } else {
+        riskBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-700';
+        statusIconWrap.className = 'w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center';
+        statusIcon.className = 'fa-solid fa-heart-circle-check text-xl';
+        riskBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+        riskBadge.innerHTML = '<i class="fa-solid fa-check"></i> ' + result.risk_level;
+      }
+    }
+  </script>
+</body>
+</html>
